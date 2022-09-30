@@ -1,12 +1,12 @@
-import React, {useEffect, useState, useCallback, useRef, useMemo} from 'react';
-import {StyleSheet, Text, View, FlatList, Alert, Pressable} from 'react-native';
+import React, {useEffect, useState, useCallback, useRef} from 'react';
+import {StyleSheet, Text, View, FlatList, Alert} from 'react-native';
 import {CardSimpleItem} from '../../components/Card';
 import {Button, TransparentButton} from '../../components/Button';
+import {ActionBottomSheet} from '../../components/BottomSheet';
 import Axios from '../../libraries/Axios';
 import {SCREEN_USER_CREATE, SCREEN_USER_EDIT, SCREEN_USER_VIEW} from './index';
 import {Spinner} from '../../components/Spinner';
-import BottomSheet, {BottomSheetBackdrop} from '@gorhom/bottom-sheet';
-import {Divider} from "../../components/Utility";
+import {Divider} from '../../components/Utility';
 
 const UserIndexScreen = ({navigation, route}) => {
   const [users, setUsers] = useState([]);
@@ -14,11 +14,6 @@ const UserIndexScreen = ({navigation, route}) => {
   const [isFetching, setIsFetching] = useState(false);
 
   const bottomSheetRef = useRef(null);
-
-  // callbacks
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
-  }, []);
 
   const fetchUsers = useCallback(async () => {
     //const response = await fetch('https://reqres.in/api/users');
@@ -78,6 +73,14 @@ const UserIndexScreen = ({navigation, route}) => {
     );
   };
 
+  // callbacks
+  const handleSheetChanges = useCallback((index: number, callback) => {
+    if (index === -1) {
+      console.log('handleSheetChanges', index);
+      callback();
+    }
+  }, []);
+
   const onOpenBottomSheet = user => {
     bottomSheetRef.current.expand();
     setSelectedUser(user);
@@ -120,17 +123,6 @@ const UserIndexScreen = ({navigation, route}) => {
     }, 200);
   };
 
-  const renderBackdrop = useCallback(
-    props => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={0}
-        appearsOnIndex={1}
-      />
-    ),
-    [],
-  );
-
   return (
     <View style={styles.sectionContainer}>
       <View style={styles.sectionTitleWrapper}>
@@ -144,49 +136,28 @@ const UserIndexScreen = ({navigation, route}) => {
       </View>
       {isFetching ? <Spinner position="inline-center" /> : renderUserList()}
 
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={['25%', '50%']}
-        onChange={handleSheetChanges}
-        enablePanDownToClose={true}
-        style={{
-          shadowColor: "#000",
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.22,
-          shadowRadius: 2.22,
-          elevation: 5,
-        }}
-        handleStyle={{paddingTop: 20, paddingBottom: 10}}
-        handleIndicatorStyle={{backgroundColor: '#ccc'}}
-        handleHeight={24}
-        backdropComponent={renderBackdrop}>
-        <View style={styles.actionContainer}>
-          <Text style={styles.actionTitle}>USER ACTION</Text>
+      <ActionBottomSheet
+        actionRef={bottomSheetRef}
+        actionTitle="USER ACTION"
+        actionClose="Cancel"
+        onChange={handleSheetChanges}>
+        <DismissBeforeAction onAction={() => onView(selectedUser)}>
           <TransparentButton
-            title="View Detail"
+            title="View Details"
             onPress={() => onView(selectedUser)}
           />
-          <Divider />
-          <TransparentButton
-            title="Edit User"
-            onPress={() => onEdit(selectedUser)}
-          />
-          <Divider />
-          <TransparentButton
-            title="Delete User"
-            onPress={() => onDelete(selectedUser)}
-          />
-          <Divider />
-          <TransparentButton
-            title="Cancel"
-            onPress={() => bottomSheetRef.current.close()}
-          />
-        </View>
-      </BottomSheet>
+        </DismissBeforeAction>
+        <Divider />
+        <TransparentButton
+          title="Edit User"
+          onPress={() => onEdit(selectedUser)}
+        />
+        <Divider />
+        <TransparentButton
+          title="Delete User"
+          onPress={() => onDelete(selectedUser)}
+        />
+      </ActionBottomSheet>
     </View>
   );
 };
@@ -211,6 +182,7 @@ const styles = StyleSheet.create({
   actionContainer: {
     flex: 1,
     padding: 20,
+    marginBottom: 20,
     alignContent: 'center',
   },
   actionTitle: {
