@@ -1,16 +1,16 @@
 import React, {useEffect, useState, useCallback, useRef} from 'react';
 import {StyleSheet, Text, View, FlatList, Alert} from 'react-native';
 import {CardSimpleItem} from '../../components/Card';
-import {Button, TransparentButton} from '../../components/Button';
+import {Button} from '../../components/Button';
 import {ActionBottomSheet} from '../../components/BottomSheet';
 import Axios from '../../libraries/Axios';
 import {SCREEN_USER_CREATE, SCREEN_USER_EDIT, SCREEN_USER_VIEW} from './index';
 import {Spinner} from '../../components/Spinner';
-import {Divider} from '../../components/Utility';
 
 const UserIndexScreen = ({navigation, route}) => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [page, setPage] = useState(1);
   const [isFetching, setIsFetching] = useState(false);
 
   const bottomSheetRef = useRef(null);
@@ -19,7 +19,7 @@ const UserIndexScreen = ({navigation, route}) => {
     //const response = await fetch('https://reqres.in/api/users');
     //const data = await response.json();
     setIsFetching(true);
-    const data = await Axios.get('users');
+    const data = await Axios.get(`users?page=${page}&per_page=10`);
 
     setUsers(data.data.data);
     setIsFetching(false);
@@ -74,10 +74,9 @@ const UserIndexScreen = ({navigation, route}) => {
   };
 
   // callbacks
-  const handleSheetChanges = useCallback((index: number, callback) => {
+  const handleSheetChanges = useCallback((index: number) => {
     if (index === -1) {
       console.log('handleSheetChanges', index);
-      callback();
     }
   }, []);
 
@@ -101,26 +100,29 @@ const UserIndexScreen = ({navigation, route}) => {
   };
 
   const onDelete = user => {
-    bottomSheetRef.current.close();
-    setTimeout(() => {
-      Alert.alert(
-        'Delete User',
-        `Are you sure want to delete user ${user.first_name} ${user.last_name}?`,
-        [
-          {text: 'Cancel', style: 'cancel'},
-          {
-            text: 'Delete',
-            style: 'destructive',
-            onPress: () => {
-              setUsers(lastUsers =>
-                lastUsers.filter(item => item.id !== user.id),
-              );
-            },
+    Alert.alert(
+      'Delete User',
+      `Are you sure want to delete user ${user.first_name} ${user.last_name}?`,
+      [
+        {text: 'Close', style: 'cancel'},
+        {
+          text: 'Cancel',
+          onPress: () => {
+            bottomSheetRef.current.expand();
           },
-        ],
-        {cancelable: true},
-      );
-    }, 200);
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            setUsers(lastUsers =>
+              lastUsers.filter(item => item.id !== user.id),
+            );
+          },
+        },
+      ],
+      {cancelable: true},
+    );
   };
 
   return (
@@ -138,26 +140,26 @@ const UserIndexScreen = ({navigation, route}) => {
 
       <ActionBottomSheet
         actionRef={bottomSheetRef}
-        actionTitle="USER ACTION"
+        actionTitle="Select Action"
         actionClose="Cancel"
-        onChange={handleSheetChanges}>
-        <DismissBeforeAction onAction={() => onView(selectedUser)}>
-          <TransparentButton
-            title="View Details"
-            onPress={() => onView(selectedUser)}
-          />
-        </DismissBeforeAction>
-        <Divider />
-        <TransparentButton
-          title="Edit User"
-          onPress={() => onEdit(selectedUser)}
-        />
-        <Divider />
-        <TransparentButton
-          title="Delete User"
-          onPress={() => onDelete(selectedUser)}
-        />
-      </ActionBottomSheet>
+        actions={[
+          {
+            action: 'View Details',
+            onPress: () => onView(selectedUser),
+            closeOnPress: true,
+          },
+          {
+            action: 'Edt User',
+            onPress: () => onEdit(selectedUser),
+            closeOnPress: true,
+          },
+          {
+            action: 'Delete User',
+            onPress: () => onDelete(selectedUser),
+            closeOnPress: true,
+          },
+        ]}
+      />
     </View>
   );
 };
@@ -178,20 +180,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     color: 'black',
-  },
-  actionContainer: {
-    flex: 1,
-    padding: 20,
-    marginBottom: 20,
-    alignContent: 'center',
-  },
-  actionTitle: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-    letterSpacing: 3,
-    color: '#cbcbcb',
   },
 });
 

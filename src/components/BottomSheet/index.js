@@ -3,18 +3,13 @@ import {StyleSheet, Text, View, Pressable} from 'react-native';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
-  useBottomSheet,
   useBottomSheetDynamicSnapPoints,
 } from '@gorhom/bottom-sheet';
-import {TransparentButton} from '../Button';
+import {Button} from '../Button';
 import {Divider} from '../Utility';
 
-const DismissBeforeAction = props => {
-  const {close} = useBottomSheet();
-  return <Pressable onPress={close}>{props.children}</Pressable>;
-};
-
-const ActionBottomSheet = ({actionRef, children, actionTitle, actionClose}) => {
+const ActionBottomSheet = ({actionRef, actions, actionTitle, actionClose}) => {
+  let currentAction = null;
   const bottomSheetRef = actionRef;
 
   const {
@@ -35,6 +30,30 @@ const ActionBottomSheet = ({actionRef, children, actionTitle, actionClose}) => {
     [],
   );
 
+  const handleSheetChanges = (index: number) => {
+    if (index === -1) {
+      if (currentAction) {
+        setTimeout(() => {
+          currentAction();
+          currentAction = null;
+        }, 75);
+      }
+    }
+  };
+
+  const triggerAction = action => {
+    const dismissOption = typeof action.closeOnPress !== 'undefined';
+    const isDismissible = dismissOption ? action.closeOnPress : false;
+    if (action.onPress) {
+      if (!isDismissible) {
+        action.onPress();
+      } else {
+        currentAction = action.onPress;
+        bottomSheetRef.current.close();
+      }
+    }
+  };
+
   return (
     <BottomSheet
       ref={bottomSheetRef}
@@ -51,15 +70,35 @@ const ActionBottomSheet = ({actionRef, children, actionTitle, actionClose}) => {
       <BottomSheetView onLayout={handleContentLayout}>
         <View style={styles.actionContainer}>
           {actionTitle && <Text style={styles.actionTitle}>{actionTitle}</Text>}
-          {children}
+          {actions.map((action, index) => {
+            const visibleOption = typeof action.visible !== 'undefined';
+            const isVisible = visibleOption ? action.visible : true;
+            if (!isVisible) {
+              return null;
+            }
+
+            return (
+              <View key={action.action}>
+                <Pressable
+                  onPress={() => triggerAction(action)}
+                  disabled={action.disabled || false}
+                  style={({pressed}) => [
+                    styles.actionButton,
+                    pressed ? styles.actionButtonPressed : {},
+                  ]}>
+                  <Text style={[styles.actionText]}>{action.action}</Text>
+                </Pressable>
+                {index < actions.length - 1 && <Divider />}
+              </View>
+            );
+          })}
           {actionClose && (
-            <>
-              <Divider />
-              <TransparentButton
-                title={actionClose}
-                onPress={() => bottomSheetRef.current.close()}
-              />
-            </>
+            <Button
+              title={actionClose}
+              onPress={() => bottomSheetRef.current.close()}
+              buttonStyle={styles.closeButton}
+              textStyle={styles.closeButtonText}
+            />
           )}
         </View>
       </BottomSheetView>
@@ -83,7 +122,6 @@ const styles = StyleSheet.create({
   actionContainer: {
     flex: 1,
     padding: 20,
-    marginBottom: 20,
     alignContent: 'center',
   },
   actionTitle: {
@@ -91,8 +129,31 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
-    letterSpacing: 3,
+    letterSpacing: 4,
     color: '#cbcbcb',
+    textTransform: 'uppercase',
+  },
+  actionButton: {
+    backgroundColor: 'transparent',
+    padding: 15,
+    borderRadius: 5,
+  },
+  actionButtonPressed: {
+    backgroundColor: '#e2e2e2',
+  },
+  actionText: {
+    color: 'black',
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    marginTop: 15,
+  },
+  closeButtonText: {
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
 });
 
