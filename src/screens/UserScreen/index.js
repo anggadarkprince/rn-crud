@@ -1,6 +1,7 @@
 import UserIndexScreen from './UserIndexScreen';
 import UserCreateScreen from './UserCreateScreen';
 import UserViewScreen from './UserViewScreen';
+import UserEditScreen from './UserEditScreen';
 
 const SCREEN_USER_INDEX = 'screen-users-index';
 const SCREEN_USER_CREATE = 'screen-users-create';
@@ -11,6 +12,7 @@ export {
   UserIndexScreen,
   UserCreateScreen,
   UserViewScreen,
+  UserEditScreen,
   SCREEN_USER_INDEX,
   SCREEN_USER_CREATE,
   SCREEN_USER_VIEW,

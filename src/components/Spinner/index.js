@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 16,
     marginStart: 10,
+    color: 'black',
   },
 });
 

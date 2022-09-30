@@ -5,9 +5,10 @@ import {
   UserIndexScreen,
   UserCreateScreen,
   UserViewScreen,
+  UserEditScreen,
   SCREEN_USER_INDEX,
   SCREEN_USER_CREATE,
-  SCREEN_USER_VIEW,
+  SCREEN_USER_VIEW, SCREEN_USER_EDIT,
 } from './src/screens/UserScreen';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -36,6 +37,11 @@ const App: () => Node = () => {
               name={SCREEN_USER_VIEW}
               component={UserViewScreen}
               options={({route}) => ({title: route.params.name})}
+            />
+            <Stack.Screen
+              name={SCREEN_USER_EDIT}
+              component={UserEditScreen}
+              options={{title: 'Edit User'}}
             />
           </Stack.Navigator>
         </NavigationContainer>

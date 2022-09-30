@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   ScrollView,
   Text,
   View,
   TextInput,
-  Image,
+  Image, Alert,
 } from 'react-native';
 import Axios from '../../libraries/Axios';
 import {Spinner} from '../../components/Spinner';
@@ -13,28 +13,44 @@ import {Button} from '../../components/Button';
 import {SCREEN_USER_INDEX} from './index';
 import {launchImageLibrary} from 'react-native-image-picker';
 
-const UserCreateScreen = ({navigation}) => {
+const UserEditScreen = ({navigation, route}) => {
+  const [user, setUser] = useState(null);
+  const [isFetching, setIsFetching] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [job, setJob] = useState('');
   const [avatar, setAvatar] = useState('');
+  const {id} = route.params;
+
+  useEffect(() => {
+    setIsFetching(true);
+    const fetchUser = async () => {
+      const data = await Axios.get(`users/${id}`);
+      const response = data.data.data;
+      setUser(response);
+      setIsFetching(false);
+      setName(`${response.first_name} ${response.last_name}`);
+      setEmail(response.email);
+      setAvatar(response.avatar);
+      navigation.setOptions({
+        title: `Edit ${response.first_name} ${response.last_name}`,
+      });
+    };
+    fetchUser().catch(error => {
+      if (error.response.status === 404) {
+        Alert.alert(
+          'Not Found',
+          `User ${route.params.name} is not found, try again later!`,
+          [{text: 'Go Back', onPress: () => navigation.goBack()}],
+        );
+      }
+    });
+  }, [id, navigation]);
 
   const onSubmit = async () => {
     setIsSubmitting(true);
-    /*fetch('https://reqres.in/api/users', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: {
-        name: 'Angga',
-        job: 'Programmer',
-      },
-    })
-      .then(response => response.json())
-      .then(json => setUsers(json.data));*/
-    const response = await Axios.post('users', {
+    const response = await Axios.put(`users/${id}`, {
       name: name,
       job: job,
     });
@@ -43,16 +59,16 @@ const UserCreateScreen = ({navigation}) => {
       name: SCREEN_USER_INDEX,
       params: {
         payload: {
-          type: 'user-created',
+          type: 'user-updated',
           response: response.data,
           user: {
-            id: response.data.id,
+            id: user.id,
             first_name: name,
             last_name: '',
             email: email,
             avatar: avatar,
           },
-        }
+        },
       },
     });
   };
@@ -72,6 +88,10 @@ const UserCreateScreen = ({navigation}) => {
     }
   };
 
+  if (isFetching) {
+    return <Spinner position="middle-block" />;
+  }
+
   return (
     <ScrollView style={styles.sectionContainer}>
       <View style={styles.inputWrapper}>
@@ -81,6 +101,7 @@ const UserCreateScreen = ({navigation}) => {
           value={name}
           style={styles.input}
           placeholder="Input the name"
+          placeholderTextColor='#b3b3b3'
           editable={!isSubmitting}
         />
       </View>
@@ -91,6 +112,7 @@ const UserCreateScreen = ({navigation}) => {
           value={email}
           style={styles.input}
           placeholder="Input email address"
+          placeholderTextColor='#b3b3b3'
           editable={!isSubmitting}
         />
       </View>
@@ -101,6 +123,7 @@ const UserCreateScreen = ({navigation}) => {
           value={job}
           style={styles.input}
           placeholder="Input job title"
+          placeholderTextColor='#b3b3b3'
           editable={!isSubmitting}
         />
       </View>
@@ -111,16 +134,16 @@ const UserCreateScreen = ({navigation}) => {
         )}
         <Button
           onPress={onPickImage}
-          title="Pick Image"
+          title="Change Image"
           buttonStyle={styles.buttonPickImage}
           disabled={isSubmitting}
         />
       </View>
-      <Button onPress={onSubmit} title="Save User" disabled={isSubmitting} />
+      <Button onPress={onSubmit} title="Update User" disabled={isSubmitting} />
       {isSubmitting && (
         <Spinner
           position="inline-center"
-          loadingText="Creating user..."
+          loadingText="Updating user..."
           size="small"
         />
       )}
@@ -159,7 +182,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   buttonPickImage: {
-    width: 100,
+    width: 150,
     backgroundColor: '#333333',
   },
   avatarPreview: {
@@ -171,4 +194,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UserCreateScreen;
+export default UserEditScreen;

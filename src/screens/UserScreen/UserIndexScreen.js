@@ -28,14 +28,14 @@ const UserIndexScreen = ({navigation, route}) => {
   const updateUser = useCallback(
     (type, user) => {
       const index = users.findIndex(item => item.id === user.id);
-      if (type === 'user-created') {
+      if (['user-created', 'user-updated'].includes(type)) {
         if (index >= 0) {
           setUsers(lastUsers => [
             ...lastUsers.slice(0, index),
             {...lastUsers[index], ...user},
             ...lastUsers.slice(index + 1),
           ]);
-        } else {
+        } else if ('user-created') {
           setUsers(lastUsers => [user, ...lastUsers]);
         }
       }
@@ -149,7 +149,7 @@ const UserIndexScreen = ({navigation, route}) => {
             closeOnPress: true,
           },
           {
-            action: 'Edt User',
+            action: 'Edit User',
             onPress: () => onEdit(selectedUser),
             closeOnPress: true,
           },
