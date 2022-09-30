@@ -5,12 +5,11 @@ import {
   Text,
   View,
   TextInput,
-  Button,
   Image,
-  TouchableOpacity,
 } from 'react-native';
 import Axios from '../../libraries/Axios';
 import {Spinner} from '../../components/Spinner';
+import {Button} from '../../components/Button';
 import {SCREEN_USER_INDEX} from './index';
 import {launchImageLibrary} from 'react-native-image-picker';
 
@@ -43,15 +42,17 @@ const UserCreateScreen = ({navigation}) => {
     navigation.navigate({
       name: SCREEN_USER_INDEX,
       params: {
-        type: 'user-created',
-        response: response.data,
-        newUser: {
-          id: response.data.id,
-          first_name: name,
-          last_name: '',
-          email: email,
-          avatar: avatar,
-        },
+        payload: {
+          type: 'user-created',
+          response: response.data,
+          user: {
+            id: response.data.id,
+            first_name: name,
+            last_name: '',
+            email: email,
+            avatar: avatar,
+          },
+        }
       },
     });
   };
@@ -109,20 +110,14 @@ const UserCreateScreen = ({navigation}) => {
         {avatar && (
           <Image style={styles.avatarPreview} source={{uri: avatar}} />
         )}
-        <TouchableOpacity
+        <Button
           onPress={onPickImage}
+          title="Pick Image"
+          buttonStyle={styles.buttonPickImage}
           disabled={isSubmitting}
-          style={[styles.button, styles.buttonPickImage]}>
-          <Text style={styles.buttonText}>Pick Image</Text>
-        </TouchableOpacity>
+        />
       </View>
-      <TouchableOpacity
-        onPress={onSubmit}
-        title="Save User"
-        disabled={isSubmitting}
-        style={styles.button}>
-        <Text style={styles.buttonText}>Save User</Text>
-      </TouchableOpacity>
+      <Button onPress={onSubmit} title="Save User" disabled={isSubmitting} />
       {isSubmitting && (
         <Spinner
           position="inline-center"
@@ -166,24 +161,6 @@ const styles = StyleSheet.create({
   buttonPickImage: {
     width: 100,
     backgroundColor: '#333333',
-  },
-  button: {
-    marginBottom: 20,
-    backgroundColor: '#731173',
-    padding: 10,
-    borderRadius: 5,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-  },
-  buttonText: {
-    color: 'white',
-    textAlign: 'center',
   },
   avatarPreview: {
     width: '70%',

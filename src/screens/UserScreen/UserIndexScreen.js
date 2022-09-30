@@ -1,13 +1,14 @@
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View, Button, FlatList} from 'react-native';
+import React, {useEffect, useState, useCallback} from 'react';
+import {StyleSheet, Text, View, FlatList} from 'react-native';
 import {CardSimpleItem} from '../../components/Card';
+import {Button} from '../../components/Button';
 import Axios from '../../libraries/Axios';
 import {SCREEN_USER_CREATE, SCREEN_USER_VIEW} from './index';
 import {Spinner} from '../../components/Spinner';
 
 const UserIndexScreen = ({navigation, route}) => {
   const [users, setUsers] = useState([]);
-  const [isFetching, setIsFetching] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
 
   const fetchUsers = async () => {
     //const response = await fetch('https://reqres.in/api/users');
@@ -19,15 +20,32 @@ const UserIndexScreen = ({navigation, route}) => {
     setIsFetching(false);
   };
 
+  const updateUser = useCallback(
+    (type, user) => {
+      const index = users.findIndex(item => item.id === user.id);
+      if (type === 'user-created') {
+        if (index >= 0) {
+          setUsers(lastUsers => [
+            ...lastUsers.slice(0, index),
+            {...lastUsers[index], ...user},
+            ...lastUsers.slice(index + 1),
+          ]);
+        } else {
+          setUsers(lastUsers => [user, ...lastUsers]);
+        }
+      }
+    },
+    [users],
+  );
+
   useEffect(() => {
-    const newUser = route.params?.newUser;
-    if (newUser) {
-      console.log(newUser);
-      setUsers(lastUsers => [newUser, ...lastUsers]);
+    const payload = route.params?.payload;
+    if (payload) {
+      updateUser(payload.type, payload.user);
     } else {
       fetchUsers();
     }
-  }, [route.params?.newUser]);
+  }, [route.params?.payload]);
 
   const renderUserList = () => {
     return (
@@ -62,11 +80,10 @@ const UserIndexScreen = ({navigation, route}) => {
           <Button
             onPress={() => navigation.navigate(SCREEN_USER_CREATE)}
             title="Create User"
-            color="#841584"
           />
         </View>
       </View>
-      {isFetching ? <Spinner position="inline-center" /> : renderUserList()}
+      {isFetching ? <Spinner position="inline-center"/> : renderUserList()}
     </View>
   );
 };

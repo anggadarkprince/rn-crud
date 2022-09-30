@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, ScrollView, Text, View, Image} from 'react-native';
+import {StyleSheet, ScrollView, Alert, Image} from 'react-native';
 import {CardFlushItem} from '../../components/Card';
 import Axios from '../../libraries/Axios';
 import {Spinner} from '../../components/Spinner';
@@ -20,7 +20,15 @@ const UserViewScreen = ({route, navigation}) => {
         title: `${response.first_name} ${response.last_name}`,
       });
     };
-    fetchUser();
+    fetchUser().catch(error => {
+      if (error.response.status === 404) {
+        Alert.alert(
+          'Not Found',
+          `User ${route.params.name} is not found, try again later!`,
+          [{text: 'Go Back', onPress: () => navigation.goBack()}],
+        );
+      }
+    });
   }, [id, navigation]);
 
   const renderUser = () => (
