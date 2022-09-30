@@ -1,14 +1,39 @@
 import React from 'react';
-import {StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, Pressable} from 'react-native';
 
 const Button = ({onPress, disabled, buttonStyle, textStyle, title}) => {
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={onPress}
       disabled={disabled}
-      style={[styles.button, buttonStyle]}>
+      style={({pressed}) => [
+        styles.button,
+        pressed ? styles.buttonPressed : {},
+        buttonStyle,
+      ]}>
       <Text style={[styles.buttonText, textStyle]}>{title}</Text>
-    </TouchableOpacity>
+    </Pressable>
+  );
+};
+
+const TransparentButton = ({
+  onPress,
+  disabled,
+  buttonStyle,
+  textStyle,
+  title,
+}) => {
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      style={({pressed}) => [
+        styles.buttonTransparent,
+        pressed ? styles.buttonTransparentPressed : {},
+        buttonStyle,
+      ]}>
+      <Text style={[styles.buttonTextTransparent, textStyle]}>{title}</Text>
+    </Pressable>
   );
 };
 
@@ -26,10 +51,25 @@ const styles = StyleSheet.create({
     shadowRadius: 1.41,
     elevation: 2,
   },
+  buttonTransparent: {
+    backgroundColor: 'transparent',
+    padding: 10,
+    borderRadius: 5,
+  },
+  buttonPressed: {
+    backgroundColor: '#600b60',
+  },
+  buttonTransparentPressed: {
+    backgroundColor: '#e2e2e2',
+  },
   buttonText: {
     color: 'white',
     textAlign: 'center',
   },
+  buttonTextTransparent: {
+    color: 'black',
+    textAlign: 'center',
+  },
 });
 
-export {Button};
+export {Button, TransparentButton};

@@ -3,7 +3,11 @@ import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 
 function CardSimpleItem(props) {
   return (
-    <TouchableOpacity style={styles.container} onPress={props.onPress}>
+    <TouchableOpacity
+      activeOpacity={0.6}
+      style={styles.container}
+      onPress={props.onPress}
+      onLongPress={props.onLongPress}>
       {props.image && (
         <Image style={styles.image} source={{uri: props.image}} />
       )}
