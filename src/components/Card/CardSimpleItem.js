@@ -5,7 +5,7 @@ function CardSimpleItem(props) {
   return (
     <TouchableOpacity
       activeOpacity={0.6}
-      style={styles.container}
+      style={[styles.container, props.style]}
       onPress={props.onPress}
       onLongPress={props.onLongPress}>
       {props.image && (

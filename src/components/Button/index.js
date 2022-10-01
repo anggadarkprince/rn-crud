@@ -10,6 +10,7 @@ const Button = ({onPress, disabled, buttonStyle, textStyle, title}) => {
         styles.button,
         pressed ? styles.buttonPressed : {},
         buttonStyle,
+        disabled ? styles.buttonDisabled : {},
       ]}>
       <Text style={[styles.buttonText, textStyle]}>{title}</Text>
     </Pressable>
@@ -58,6 +59,9 @@ const styles = StyleSheet.create({
   },
   buttonPressed: {
     backgroundColor: '#600b60',
+  },
+  buttonDisabled: {
+    backgroundColor: '#b160b1',
   },
   buttonTransparentPressed: {
     backgroundColor: '#e2e2e2',
