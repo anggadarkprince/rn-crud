@@ -1,6 +1,7 @@
-import LoginScreen from './LoginScreen';
+import {LoginScreen} from './LoginScreen';
+import {RegisterScreen} from './RegisterScreen';
 
 const SCREEN_LOGIN = 'screen-login';
 const SCREEN_REGISTER = 'screen-register';
 
-export {LoginScreen, SCREEN_LOGIN, SCREEN_REGISTER};
+export {LoginScreen, RegisterScreen, SCREEN_LOGIN, SCREEN_REGISTER};

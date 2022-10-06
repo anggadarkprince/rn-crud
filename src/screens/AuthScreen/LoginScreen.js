@@ -8,9 +8,11 @@ import {
 import Axios from '../../libraries/Axios';
 import {Spinner} from '../../components/Spinner';
 import {Button} from '../../components/Button';
-import {SCREEN_USER_INDEX} from '../UserScreen';
+import {SCREEN_USER_INDEX, SCREEN_USER_VIEW} from '../UserScreen';
+import Pressable from "react-native/Libraries/Components/Pressable/Pressable";
+import {SCREEN_REGISTER} from "./index";
 
-const LoginScreen = ({navigation}) => {
+export const LoginScreen = ({navigation}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [email, setEmail] = useState('eve.holt@reqres.in');
@@ -28,7 +30,6 @@ const LoginScreen = ({navigation}) => {
         email: email,
         password: password,
       });
-      console.log(response.data);
       navigation.reset({
         index: 0,
         routes: [{name: SCREEN_USER_INDEX}],
@@ -73,6 +74,11 @@ const LoginScreen = ({navigation}) => {
         />
       </View>
       <Button onPress={onSubmit} title="Login" disabled={isSubmitting} />
+      <Pressable
+        disabled={isSubmitting}
+        onPress={() => navigation.navigate(SCREEN_REGISTER)}>
+        <Text style={styles.textRegister}>Don't have an account? Register</Text>
+      </Pressable>
       {isSubmitting && (
         <Spinner
           position="inline-center"
@@ -106,17 +112,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontWeight: 'bold',
   },
-  sectionTitleWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: 'black',
-  },
   inputWrapper: {
     marginBottom: 20,
   },
@@ -131,10 +126,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
   },
-  buttonPickImage: {
-    width: 100,
-    backgroundColor: '#333333',
+  textRegister: {
+    textAlign: 'center',
+    padding: 25,
+    color: '#32328f',
   },
 });
-
-export default LoginScreen;

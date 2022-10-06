@@ -1,5 +1,4 @@
-import React, {useState} from 'react';
-import type {Node} from 'react';
+import React from 'react';
 import {SafeAreaView, StatusBar, StyleSheet,} from 'react-native';
 import {
   UserIndexScreen,
@@ -14,11 +13,16 @@ import {
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {LoginScreen, SCREEN_LOGIN} from './src/screens/AuthScreen';
+import {
+  LoginScreen,
+  RegisterScreen,
+  SCREEN_LOGIN,
+  SCREEN_REGISTER,
+} from './src/screens/AuthScreen';
 
 const Stack = createNativeStackNavigator();
 
-const App: () => Node = () => {
+const App = () => {
   return (
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaView style={styles.container}>
@@ -28,6 +32,11 @@ const App: () => Node = () => {
             <Stack.Screen
               name={SCREEN_LOGIN}
               component={LoginScreen}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name={SCREEN_REGISTER}
+              component={RegisterScreen}
               options={{headerShown: false}}
             />
             <Stack.Screen
