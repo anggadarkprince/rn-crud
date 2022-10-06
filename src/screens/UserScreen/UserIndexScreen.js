@@ -1,5 +1,13 @@
 import React, {useEffect, useState, useCallback, useRef} from 'react';
-import {StyleSheet, Text, View, FlatList, Alert} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  BackHandler,
+  ToastAndroid,
+} from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
 import {CardSimpleItem} from '../../components/Card';
 import {Button} from '../../components/Button';
 import {ActionBottomSheet} from '../../components/BottomSheet';
@@ -9,6 +17,7 @@ import Axios from '../../libraries/Axios';
 import {SCREEN_USER_CREATE, SCREEN_USER_EDIT, SCREEN_USER_VIEW} from './index';
 import {Spinner} from '../../components/Spinner';
 
+let currentCount = 0;
 const UserIndexScreen = ({navigation, route}) => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -28,20 +37,52 @@ const UserIndexScreen = ({navigation, route}) => {
 
   const updateUser = useCallback(
     (type, user) => {
-      const index = users.findIndex(item => item.id === user.id);
+      const index = users.data.findIndex(item => item.id === user.id);
       if (['user-created', 'user-updated'].includes(type)) {
         if (index >= 0) {
-          setUsers(lastUsers => [
-            ...lastUsers.slice(0, index),
-            {...lastUsers[index], ...user},
-            ...lastUsers.slice(index + 1),
-          ]);
+          setUsers(item => {
+            const lastUsers = item.data;
+            const updatedUsers = [
+              ...lastUsers.slice(0, index),
+              {...lastUsers[index], ...user},
+              ...lastUsers.slice(index + 1),
+            ];
+            return {...item, data: updatedUsers};
+          });
         } else if ('user-created') {
-          setUsers(lastUsers => [user, ...lastUsers]);
+          setUsers(lastUsers => ({
+            ...lastUsers,
+            data: [user, ...lastUsers.data],
+          }));
         }
       }
     },
     [users],
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        if (currentCount === 1) {
+          return false;
+        }
+        if (currentCount < 1) {
+          currentCount += 1;
+          ToastAndroid.show('Press again to close!', ToastAndroid.SHORT);
+        }
+        setTimeout(() => {
+          currentCount = 0;
+        }, 2000);
+
+        console.log('hold')
+        return true;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
   );
 
   useEffect(() => {

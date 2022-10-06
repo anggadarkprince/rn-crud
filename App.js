@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {useState} from 'react';
 import type {Node} from 'react';
-import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
+import {SafeAreaView, StatusBar, StyleSheet,} from 'react-native';
 import {
   UserIndexScreen,
   UserCreateScreen,
@@ -8,11 +8,13 @@ import {
   UserEditScreen,
   SCREEN_USER_INDEX,
   SCREEN_USER_CREATE,
-  SCREEN_USER_VIEW, SCREEN_USER_EDIT,
+  SCREEN_USER_VIEW,
+  SCREEN_USER_EDIT,
 } from './src/screens/UserScreen';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {LoginScreen, SCREEN_LOGIN} from './src/screens/AuthScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +25,11 @@ const App: () => Node = () => {
         <StatusBar barStyle={'dark-content'} backgroundColor={'transparent'} />
         <NavigationContainer independent={true}>
           <Stack.Navigator screenOptions={{safeAreaInsets: {top: 0}}}>
+            <Stack.Screen
+              name={SCREEN_LOGIN}
+              component={LoginScreen}
+              options={{headerShown: false}}
+            />
             <Stack.Screen
               name={SCREEN_USER_INDEX}
               component={UserIndexScreen}
