@@ -12,6 +12,7 @@ import Axios from '../../libraries/Axios';
 import {Spinner} from '../../components/Spinner';
 import {Button} from '../../components/Button';
 import {SCREEN_USER_INDEX} from '../UserScreen';
+import {AuthContext} from "../../../App";
 
 export const RegisterScreen = ({navigation}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,6 +22,8 @@ export const RegisterScreen = ({navigation}) => {
   const [password, setPassword] = useState('cityslicka');
   const [confirmPassword, setConfirmPassword] = useState('cityslicka');
 
+  const {signUp} = React.useContext(AuthContext);
+
   function capitalizeFirst(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
@@ -29,6 +32,12 @@ export const RegisterScreen = ({navigation}) => {
     setIsSubmitting(true);
     setError('');
     try {
+      await signUp({
+        name: name,
+        email: email,
+        password: password,
+      });
+      /*
       const response = await Axios.post('register', {
         email: email,
         password: password,
@@ -38,9 +47,12 @@ export const RegisterScreen = ({navigation}) => {
         index: 0,
         routes: [{name: SCREEN_USER_INDEX}],
       });
+       */
     } catch (e) {
       if ([400, 404].includes(e.response.status)) {
-        setError(capitalizeFirst(e.response.data.error || 'User cannot be registered'));
+        setError(
+          capitalizeFirst(e.response.data.error || 'User cannot be registered'),
+        );
       } else {
         setError('Something went wrong, try again later!');
       }

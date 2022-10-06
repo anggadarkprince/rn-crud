@@ -6043,6 +6043,11 @@
     "jscodeshift" "^0.13.1"
     "nullthrows" "^1.1.1"
 
+"react-native-encrypted-storage@^4.0.2":
+  "integrity" "sha512-vneDkHGDuTvLQjUBztqb2YI8QoH1zxdJonPGTS+g57lfJZff9fAjoLSSb6NgMBebpXFcK3I3sEresGyL+3AArw=="
+  "resolved" "https://registry.npmjs.org/react-native-encrypted-storage/-/react-native-encrypted-storage-4.0.2.tgz"
+  "version" "4.0.2"
+
 "react-native-gesture-handler@^2.6.2", "react-native-gesture-handler@>=1.10.1":
   "integrity" "sha512-Ff/WKlR8KiM1wq7UJZvIyCB+OsweewaeZk+4RDIYNGM9tvNIAXEm/MtYnLHiBXiSJjZItF/8B83gE6pVq40vIw=="
   "resolved" "https://registry.npmjs.org/react-native-gesture-handler/-/react-native-gesture-handler-2.6.2.tgz"

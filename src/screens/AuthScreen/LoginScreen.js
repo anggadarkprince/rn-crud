@@ -4,19 +4,22 @@ import {
   Text,
   View,
   TextInput,
+  Pressable,
 } from 'react-native';
 import Axios from '../../libraries/Axios';
 import {Spinner} from '../../components/Spinner';
 import {Button} from '../../components/Button';
-import {SCREEN_USER_INDEX, SCREEN_USER_VIEW} from '../UserScreen';
-import Pressable from "react-native/Libraries/Components/Pressable/Pressable";
-import {SCREEN_REGISTER} from "./index";
+import {SCREEN_USER_INDEX} from '../UserScreen';
+import {SCREEN_REGISTER} from './index';
+import {AuthContext} from '../../../App';
 
 export const LoginScreen = ({navigation}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [email, setEmail] = useState('eve.holt@reqres.in');
   const [password, setPassword] = useState('cityslicka');
+
+  const {signIn} = React.useContext(AuthContext);
 
   function capitalizeFirst(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -26,6 +29,11 @@ export const LoginScreen = ({navigation}) => {
     setIsSubmitting(true);
     setError('');
     try {
+      await signIn({
+        email: email,
+        password: password,
+      });
+      /*
       const response = await Axios.post('login', {
         email: email,
         password: password,
@@ -34,6 +42,7 @@ export const LoginScreen = ({navigation}) => {
         index: 0,
         routes: [{name: SCREEN_USER_INDEX}],
       });
+      */
     } catch (e) {
       if ([400, 404].includes(e.response.status)) {
         setError(capitalizeFirst(e.response.data.error || 'User not found'));
