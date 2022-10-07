@@ -19,7 +19,7 @@ import {Spinner} from '../../components/Spinner';
 
 let currentCount = 0;
 const UserIndexScreen = ({navigation, route}) => {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState({});
   const [selectedUser, setSelectedUser] = useState(null);
   const [page, setPage] = useState(1);
   const [isFetching, setIsFetching] = useState(false);
@@ -37,7 +37,7 @@ const UserIndexScreen = ({navigation, route}) => {
 
   const updateUser = useCallback(
     (type, user) => {
-      const index = users.data.findIndex(item => item.id === user.id);
+      const index = (users.data || []).findIndex(item => item.id === user.id);
       if (['user-created', 'user-updated'].includes(type)) {
         if (index >= 0) {
           setUsers(item => {
@@ -74,7 +74,6 @@ const UserIndexScreen = ({navigation, route}) => {
           currentCount = 0;
         }, 2000);
 
-        console.log('hold')
         return true;
       };
 
@@ -86,25 +85,31 @@ const UserIndexScreen = ({navigation, route}) => {
   );
 
   useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers, page]);
+
+  useEffect(() => {
     const payload = route.params?.payload;
     if (payload) {
       updateUser(payload.type, payload.user);
-    } else {
-      fetchUsers();
     }
   }, [route.params?.payload, fetchUsers]);
 
   const renderUserList = () => {
     return (
       <FlatList
-        data={users.data}
+        data={users.data || []}
         renderItem={({item, index}) => (
           <CardSimpleItem
             key={`user-${item.id}`}
             title={`${item.first_name} ${item.last_name}`}
             description={item.email}
             image={item.avatar}
-            style={index === users.data.length - 1 ? {marginBottom: 85} : {}}
+            style={
+              index === (users.data || []).length - 1 ? {marginBottom: 85} : {}
+            }
+            buttonAction={true}
+            actionOnPress={() => onOpenBottomSheet(item)}
             onPress={() => onView(item)}
             onLongPress={() => onOpenBottomSheet(item)}
           />
@@ -112,6 +117,7 @@ const UserIndexScreen = ({navigation, route}) => {
         keyExtractor={item => item.id}
         onRefresh={fetchUsers}
         refreshing={isFetching}
+        showsVerticalScrollIndicator={false}
       />
     );
   };

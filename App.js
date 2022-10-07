@@ -92,7 +92,7 @@ const App = () => {
           password: data.password,
         });
         const token = response.data.token;
-
+        await EncryptedStorage.setItem('userToken', token);
         dispatch({type: 'SIGN_IN', token: token});
       },
       signOut: () => dispatch({type: 'SIGN_OUT'}),
@@ -106,7 +106,7 @@ const App = () => {
           password: data.password,
         });
         const token = response.data.token;
-
+        await EncryptedStorage.setItem('userToken', token);
         dispatch({type: 'SIGN_IN', token: token});
       },
     }),

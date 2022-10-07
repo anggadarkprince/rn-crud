@@ -1,5 +1,12 @@
 import React from 'react';
-import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+} from 'react-native';
 
 function CardSimpleItem(props) {
   return (
@@ -15,6 +22,11 @@ function CardSimpleItem(props) {
         <Text style={styles.title}>{props.title}</Text>
         <Text style={styles.description}>{props.description}</Text>
       </View>
+      {props.buttonAction && (
+        <Pressable style={styles.actionButton} onPress={props.actionOnPress}>
+          <Text style={styles.actionText}>⋮</Text>
+        </Pressable>
+      )}
     </TouchableOpacity>
   );
 }
@@ -27,6 +39,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#fff',
   },
   image: {
@@ -38,6 +51,16 @@ const styles = StyleSheet.create({
   },
   title: {fontWeight: 'bold', fontSize: 16, color: 'black'},
   description: {color: '#666'},
+  actionButton: {
+    marginStart: 'auto',
+  },
+  actionText: {
+    fontSize: 20,
+    paddingVertical: 5,
+    marginHorizontal: 10,
+    fontWeight: 'bold',
+    color: 'black',
+  },
 });
 
 export default CardSimpleItem;
